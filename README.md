@@ -35,4 +35,18 @@ This application allows users to **create, read, update, and delete (CRUD) blog 
 ---
 
 ## 📂 Project Structure
+blog-application/
+│── client/ # React frontend
+│ ├── src/
+│ │ ├── components/ # Reusable components
+│ │ ├── pages/ # Pages (Home, Blog, Login, Register, etc.)
+│ │ ├── App.js
+│ │ └── index.js
+│── server/ # Node + Express backend
+│ ├── models/ # MongoDB models
+│ ├── routes/ # API routes
+│ ├── controllers/ # Controller logic
+│ ├── server.js # Entry point
+│── package.json
+│── README.md
 
