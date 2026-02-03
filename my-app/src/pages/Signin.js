@@ -12,7 +12,7 @@ const Signin = () => {
 
   const navigate = useNavigate();
 
-  const hadelInputChnge = (e) => {
+  const handelInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
@@ -63,7 +63,7 @@ const Signin = () => {
             label='Email'
             variant='outlined'
             value={formData.email}
-            onChange={hadelInputChnge}
+            onChange={handelInputChange}
           />
           <TextField
             fullWidth
@@ -74,7 +74,7 @@ const Signin = () => {
             type="password"
             variant='outlined'
             value={formData.password}
-            onChange={hadelInputChnge}
+            onChange={handelInputChange}
           />
           <Box display="flex" justifyContent="flex-end">
             <Link to="/signup" style={{ textDecoration: 'none' }}>

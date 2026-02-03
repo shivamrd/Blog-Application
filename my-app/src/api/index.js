@@ -8,11 +8,24 @@ export const signup = (formData) => API.post('/user/signup',formData)
 
 export const createBlog= (formData) => API.post('/blog/',formData)
 
-export const getAllBlogs = (formData) => API.get('/blog/')
+export const getAllBlogs = () => API.get('/blog/')
 
 export const deleteBlog = (id) => API.delete(`/blog/${id}`)
 
 export const editBlog = (id, formData) => API.put(`/blog/${id}`, formData)
 
-export const getBlogBySearch = (searchQuery) =>
-  API.get(`/blog/search?searchQuery=${searchQuery.search || 'none'}&tags=${searchQuery.tags || 'none'}`);
+// export const getBlogBySearch = (searchQuery) =>
+//   API.get(`/blog/search?searchQuery=${searchQuery.search || 'none'}&tags=${searchQuery.tags || 'none'}`);
+export const getBlogBySearch = ({ searchQuery, tags }) => {
+  const params = new URLSearchParams();
+
+  if (searchQuery?.trim()) {
+    params.append('searchQuery', searchQuery.trim());
+  }
+
+  if (tags?.trim()) {
+    params.append('tags', tags.trim());
+  }
+
+  return API.get(`/blog/search?${params.toString()}`);
+};

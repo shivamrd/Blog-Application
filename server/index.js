@@ -15,10 +15,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 //mongodb connection
 mongoose.connect("mongodb://localhost:27017/shivam")
-.then(()=>{console.log('MongoDB conneccton successful')})
+.then(()=>{console.log('MongoDB connection successful')})
 .catch((err)=> console.log(err));
 
-//niddleware
+//middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cors())

@@ -65,31 +65,44 @@ export const getBlogById = async (req, res) => {
 
 
 export const getBlogBySearch = async (req, res) => {
-  const { searchQuery = '', tags = '' } = req.query;
+  const { searchQuery, tags } = req.query;
 
   try {
-    const title = new RegExp(searchQuery, 'i');
-    const tagsArray = tags && tags !== 'none' ? tags.split(',').map(tag => tag.trim()) : [];
+    let query = {};
 
-    let blogs;
-
-    if (tagsArray.length > 0) {
-      blogs = await Blog.find({
-        $or: [
-          { title },
-          { tags: { $in: tagsArray } }
-        ]
-      });
-    } else {
-      blogs = await Blog.find({ title });
+    // 🔎 Title search
+    if (searchQuery && searchQuery.trim()) {
+      query.title = { $regex: searchQuery.trim(), $options: 'i' };
     }
+
+    // 🏷 Tag search
+    if (tags && tags.trim()) {
+      const tagsArray = tags
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean)
+        .map(tag => (tag.startsWith('#') ? tag : `#${tag}`));
+
+      // ✅ MATCH ANY tag
+      query.tags = { $in: tagsArray };
+    }
+
+    // ❌ Block empty search (VERY IMPORTANT)
+    if (Object.keys(query).length === 0) {
+      return res.status(400).json({ blogs: [] });
+    }
+
+    const blogs = await Blog.find(query);
 
     return res.status(200).json({ blogs });
   } catch (error) {
-    console.error("🔥 getBlogBySearch Error:", error.message);
-    return res.status(500).json({ mssg: "Search failed", error: error.message });
+    console.error("🔥 getBlogBySearch Error:", error);
+    return res.status(500).json({ message: "Search failed" });
   }
 };
+
+
+
 
 
 
@@ -107,6 +120,7 @@ export const updateBlog = async(req,res) => {
         return res.status(500).json({ mssg: "Something went wrong" })
     }
 }
+
  export const  deleteBlog = async(req,res) => {
         const {id} = req.params;
     try{

@@ -19,7 +19,7 @@ const blogSchema = new mongoose.Schema({
     },
     tags: {
         type: [String], // ✅ Correct way to define an array of strings
-        required: false
+        index: true
     }
 });
 

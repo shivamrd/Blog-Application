@@ -44,24 +44,30 @@ const Home = () => {
   }, []);
 
   const handleSearch = async () => {
-    if (search.trim() || tags.length > 0) {
-      setHasSearched(true);
-      const response = await getBlogBySearch({
-        search,
-        tags: tags.join(","),
-      });
-      console.log("Search Result:", response.data.blogs);
-      setSearchResult(response.data.blogs);
-      navigate(`/blog/search?searchQuery=${search || 'none'}&tags=${tags.join(',') || 'none'}`);
-    } else {
-      navigate('/');
-    }
-  };
+  if (!search.trim() && tags.length === 0) return;
+
+  setHasSearched(true);
+
+  const response = await getBlogBySearch({
+    searchQuery: search.trim(),
+    tags: tags.join(','),
+  });
+
+  setSearchResult(response.data.blogs);
+
+  const params = new URLSearchParams();
+  if (search.trim()) params.append('searchQuery', search.trim());
+  if (tags.length) params.append('tags', tags.join(','));
+
+  navigate(`/blog/search?${params.toString()}`);
+};
+
 
   return (
     <div>
       <Navbar />
       <Box sx={{ padding: 4, backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+        
         {/* Search Section */}
         <Box
           sx={{
@@ -85,6 +91,7 @@ const Home = () => {
             onChange={(e) => setSearch(e.target.value)}
             sx={{ minWidth: '250px' }}
           />
+
           <TextField
             name="tags"
             label="Search Tags"
@@ -95,6 +102,7 @@ const Home = () => {
             placeholder="Press Enter or comma to add"
             sx={{ minWidth: '250px' }}
           />
+
           <Button
             variant="contained"
             onClick={handleSearch}
@@ -159,24 +167,24 @@ const Home = () => {
 
           <Grid container spacing={3}>
             {(hasSearched ? searchResult : blogs).length === 0 ? (
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="body1" color="gray">
                   No blogs found.
                 </Typography>
               </Grid>
             ) : (
               (hasSearched ? searchResult : blogs).map((blog) => (
-                <Grid item key={blog._id} xs={12} sm={6} md={4}>
+                <Grid key={blog._id} size={{ xs: 12, sm: 6, md: 4 }}>
                   <Blog data={blog} />
                 </Grid>
               ))
             )}
           </Grid>
         </Box>
+
       </Box>
     </div>
   );
 };
 
 export default Home;
-
