@@ -1,137 +1,137 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from "react-router-dom";
 import signupimage from "../images/signupimage.jpg";
-import { signup } from '../api';
+import { signup } from "../api";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const navigate = useNavigate();
 
-  const handelInputChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
   const handleSignup = async (e) => {
-    console.log(formData);
+    e.preventDefault(); // ✅ VERY IMPORTANT
+
+    // basic frontend validation
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
     try {
-      const response = await signup(formData);
-      console.log("Signup Successful", response.data);
-      navigate('/');
+      const response = await signup({
+        ...formData,
+        email: formData.email.toLowerCase(), // ✅ normalize email
+      });
+
+      // ✅ save auth data
+      localStorage.setItem(
+        "user",
+        JSON.stringify(response.data.result)
+      );
+      localStorage.setItem("token", response.data.token);
+
+      navigate('/blogs', { replace: true });
+
     } catch (error) {
-      console.log("Signup Failed:", error);
-      setFormData({ email: '', password: '', name: '', confirmPassword: '' });
+      console.log(
+        "Signup Failed:",
+        error.response?.data?.message
+      );
+      alert(error.response?.data?.message || "Signup failed");
     }
   };
 
   return (
     <Box display="flex" height="100vh" bgcolor="#f5f5f5">
-      {/* Left Side - Image */}
+      {/* Left Image */}
       <Box
-        flex="1"
+        flex={1}
         display="flex"
         justifyContent="center"
         alignItems="center"
-        sx={{
-          background: '#e3f2fd',
-          borderRadius: '0 20px 20px 0'
-        }}
+        sx={{ background: "#e3f2fd" }}
       >
         <img
           src={signupimage}
-          alt="Signup Visual"
+          alt="Signup"
           style={{
-            maxHeight: '70vh',
-            maxWidth: '100%',
-            borderRadius: '10px',
-            objectFit: 'cover',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+            maxHeight: "70vh",
+            borderRadius: "12px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
           }}
         />
       </Box>
 
-      {/* Right Side - Form */}
+      {/* Right Form */}
       <Box
-        flex="1"
+        flex={1}
         display="flex"
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
         px={4}
-        boxShadow={3}
-        bgcolor="#ffffff"
-        borderRadius="20px 0 0 20px"
+        bgcolor="#fff"
       >
-        <Typography fontSize="42px" fontWeight="600" color="#333">
+        <Typography fontSize="36px" fontWeight="600">
           Create Account
-        </Typography>
-        <Typography fontSize="16px" color="gray" mb={4}>
-          Join us by signing up
         </Typography>
 
         <Box width="100%" maxWidth="400px">
           <TextField
             fullWidth
             margin="normal"
-            id='name'
-            name='name'
-            label='Name'
-            variant='outlined'
+            name="name"
+            label="Name"
             value={formData.name}
-            onChange={handelInputChange}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            id='email'
-            name='email'
-            label='Email'
-            variant='outlined'
-            value={formData.email}
-            onChange={handelInputChange}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            id='password'
-            name='password'
-            label='Password'
-            type='password'
-            variant='outlined'
-            value={formData.password}
-            onChange={handelInputChange}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            id='confirmPassword'
-            name='confirmPassword'
-            label='Confirm Password'
-            type='password'
-            variant='outlined'
-            value={formData.confirmPassword}
-            onChange={handelInputChange}
+            onChange={handleInputChange}
           />
 
-          <Box display="flex" justifyContent="flex-end">
-            <Link to="/signin" style={{ textDecoration: 'none' }}>
-              <Typography
-                fontSize="14px"
-                fontWeight="500"
-                color="#1976d2"
-                mt={1}
-                sx={{ '&:hover': { textDecoration: 'underline' } }}
-              >
+          <TextField
+            fullWidth
+            margin="normal"
+            name="email"
+            label="Email"
+            value={formData.email}
+            onChange={handleInputChange}
+          />
+
+          <TextField
+            fullWidth
+            margin="normal"
+            name="password"
+            label="Password"
+            type="password"
+            value={formData.password}
+            onChange={handleInputChange}
+          />
+
+          <TextField
+            fullWidth
+            margin="normal"
+            name="confirmPassword"
+            label="Confirm Password"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+          />
+
+          <Box display="flex" justifyContent="flex-end" mt={1}>
+            <Link to="/signin" style={{ textDecoration: "none" }}>
+              <Typography color="primary">
                 Already a user?
               </Typography>
             </Link>
@@ -140,19 +140,8 @@ const Signup = () => {
           <Button
             fullWidth
             variant="contained"
+            sx={{ mt: 3, py: 1.5 }}
             onClick={handleSignup}
-            sx={{
-              mt: 4,
-              py: 1.5,
-              fontSize: '16px',
-              fontWeight: 600,
-              textTransform: 'none',
-              borderRadius: '10px',
-              backgroundColor: '#1976d2',
-              '&:hover': {
-                backgroundColor: '#115293',
-              }
-            }}
           >
             Sign Up
           </Button>

@@ -1,136 +1,119 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from "react-router-dom";
 import signinimage from "../images/signinimage.jpg";
-import { signin } from '../api';
+import { signin } from "../api";
 
 const Signin = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
 
   const navigate = useNavigate();
 
-  const handelInputChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
   const handleSignin = async (e) => {
-    console.log(formData);
+    e.preventDefault();
+
     try {
-      const response = await signin(formData);
-      console.log("Signin Successful", response.data);
-      localStorage.setItem("author", response.data.result._id.toString());
-      navigate('/');
+      const response = await signin({
+        ...formData,
+        email: formData.email.toLowerCase(),
+      });
+
+      // ✅ STORE FULL AUTH DATA
+      localStorage.setItem(
+        "profile",
+        JSON.stringify(response.data)
+      );
+
+      navigate('/blogs', { replace: true });
+
     } catch (error) {
-      console.log("Signin Failed:", error);
-      setFormData({ email: '', password: '' });
+      console.log("Signin Failed:", error.response?.data?.message);
+      alert(error.response?.data?.message || "Signin failed");
+      setFormData({ email: "", password: "" });
     }
   };
 
   return (
-    <Box display='flex' height='100vh' bgcolor="#f5f5f5">
-      {/* Left Side - Form */}
+    <Box display="flex" height="100vh" bgcolor="#f5f5f5">
+      {/* LEFT FORM */}
       <Box
-        flex="1"
+        flex={1}
         display="flex"
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
         px={4}
-        boxShadow={3}
         bgcolor="#ffffff"
-        borderRadius="0 20px 20px 0"
       >
-        <Typography fontSize="42px" fontWeight="600" color="#333">
-          Welcome Back
-        </Typography>
-        <Typography fontSize="16px" color="gray" mb={4}>
-          Sign in to continue
+        <Typography fontSize="40px" fontWeight="600">
+          Welcome Back 👋
         </Typography>
 
         <Box width="100%" maxWidth="400px">
           <TextField
             fullWidth
             margin="normal"
-            id='email'
-            name='email'
-            label='Email'
-            variant='outlined'
+            name="email"
+            label="Email"
             value={formData.email}
-            onChange={handelInputChange}
+            onChange={handleInputChange}
           />
+
           <TextField
             fullWidth
             margin="normal"
-            id='password'
-            name='password'
-            label='Password'
+            name="password"
+            label="Password"
             type="password"
-            variant='outlined'
             value={formData.password}
-            onChange={handelInputChange}
+            onChange={handleInputChange}
           />
+
           <Box display="flex" justifyContent="flex-end">
-            <Link to="/signup" style={{ textDecoration: 'none' }}>
-              <Typography
-                fontSize="14px"
-                fontWeight="500"
-                color="#1976d2"
-                mt={1}
-                sx={{ '&:hover': { textDecoration: 'underline' } }}
-              >
+            <Link to="/signup" style={{ textDecoration: "none" }}>
+              <Typography color="primary" mt={1}>
                 Create account
               </Typography>
             </Link>
           </Box>
+
           <Button
             fullWidth
             variant="contained"
+            sx={{ mt: 3, py: 1.5 }}
             onClick={handleSignin}
-            sx={{
-              mt: 4,
-              py: 1.5,
-              fontSize: '16px',
-              fontWeight: 600,
-              textTransform: 'none',
-              borderRadius: '10px',
-              backgroundColor: '#1976d2',
-              '&:hover': {
-                backgroundColor: '#115293',
-              }
-            }}
           >
             Sign In
           </Button>
         </Box>
       </Box>
 
-      {/* Right Side - Image */}
+      {/* RIGHT IMAGE */}
       <Box
-        flex="1"
+        flex={1}
         display="flex"
         justifyContent="center"
         alignItems="center"
-        sx={{
-          background: '#e3f2fd',
-          borderRadius: '20px 0 0 20px'
-        }}
+        sx={{ background: "#e3f2fd" }}
       >
         <img
           src={signinimage}
-          alt="Signin Visual"
+          alt="Signin"
           style={{
-            maxHeight: '70vh',
-            maxWidth: '100%',
-            borderRadius: '10px',
-            objectFit: 'cover',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+            maxHeight: "70vh",
+            borderRadius: "12px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
           }}
         />
       </Box>

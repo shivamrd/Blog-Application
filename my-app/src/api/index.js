@@ -1,31 +1,26 @@
-import axios from 'axios'
+import axios from "axios";
 
-const API = axios.create({baseURL: 'http://localhost:8000'})
+const API = axios.create({ baseURL: "http://localhost:8000" });
 
-export const signin = (formData) => API.post('/user/signin',formData)
-
-export const signup = (formData) => API.post('/user/signup',formData)
-
-export const createBlog= (formData) => API.post('/blog/',formData)
-
-export const getAllBlogs = () => API.get('/blog/')
-
-export const deleteBlog = (id) => API.delete(`/blog/${id}`)
-
-export const editBlog = (id, formData) => API.put(`/blog/${id}`, formData)
-
-// export const getBlogBySearch = (searchQuery) =>
-//   API.get(`/blog/search?searchQuery=${searchQuery.search || 'none'}&tags=${searchQuery.tags || 'none'}`);
-export const getBlogBySearch = ({ searchQuery, tags }) => {
-  const params = new URLSearchParams();
-
-  if (searchQuery?.trim()) {
-    params.append('searchQuery', searchQuery.trim());
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    req.headers.authorization = `Bearer ${token}`;
   }
+  return req;
+});
 
-  if (tags?.trim()) {
-    params.append('tags', tags.trim());
-  }
+export const signin = (data) => API.post("/user/signin", data);
+export const signup = (data) => API.post("/user/signup", data);
 
-  return API.get(`/blog/search?${params.toString()}`);
-};
+export const getBlogsByRole = (userId, role) =>
+  API.get(`/blog/role`, {
+    params: { userId, role },
+  });
+
+export const getBlogBySearch = (params) =>
+  API.get(`/blog/search`, { params });
+
+export const createBlog = (data) => API.post("/blog", data);
+export const deleteBlog = (id) => API.delete(`/blog/${id}`);
+export const editBlog = (id, data) => API.put(`/blog/${id}`, data);

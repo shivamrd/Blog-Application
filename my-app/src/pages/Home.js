@@ -1,190 +1,173 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import Blog from "../components/Blog";
-import { getAllBlogs, getBlogBySearch } from "../api";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-const Home = () => {
-  const [search, setSearch] = useState('');
-  const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState([]);
-  const [blogs, setBlogs] = useState([]);
-  const [searchResult, setSearchResult] = useState([]);
-  const [hasSearched, setHasSearched] = useState(false);
-  const navigate = useNavigate();
-
-  const handleAddTag = (e) => {
-    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim() !== '') {
-      e.preventDefault();
-      const trimmedTag = tagInput.trim();
-      if (!tags.includes(trimmedTag)) {
-        setTags([...tags, trimmedTag]);
-        setTagInput('');
-      }
-    }
-  };
-
-  const handleDelete = (tagToDelete) => {
-    setTags(tags.filter((tag) => tag !== tagToDelete));
-  };
-
-  useEffect(() => {
-    const getBlogs = async () => {
-      try {
-        const response = await getAllBlogs();
-        console.log("All Blogs:", response.data);
-        setBlogs(response.data.blogs);
-      } catch (error) {
-        console.log("failed", error);
-      }
-    };
-
-    getBlogs();
-  }, []);
-
-  const handleSearch = async () => {
-  if (!search.trim() && tags.length === 0) return;
-
-  setHasSearched(true);
-
-  const response = await getBlogBySearch({
-    searchQuery: search.trim(),
-    tags: tags.join(','),
-  });
-
-  setSearchResult(response.data.blogs);
-
-  const params = new URLSearchParams();
-  if (search.trim()) params.append('searchQuery', search.trim());
-  if (tags.length) params.append('tags', tags.join(','));
-
-  navigate(`/blog/search?${params.toString()}`);
-};
-
-
+export default function Home() {
   return (
-    <div>
-      <Navbar />
-      <Box sx={{ padding: 4, backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-        
-        {/* Search Section */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 2,
-            padding: 3,
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-            mb: 4,
-          }}
-        >
-          <TextField
-            name="search"
-            label="Search Blogs"
-            variant="outlined"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ minWidth: '250px' }}
-          />
+    <div className="home-container">
+      {/* Top Auth Buttons */}
+      <div className="auth-buttons">
+        <Link to="/signin" className="btn login-btn">Login</Link>
+        <Link to="/signup" className="btn signup-btn">Sign Up</Link>
+      </div>
 
-          <TextField
-            name="tags"
-            label="Search Tags"
-            variant="outlined"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleAddTag}
-            placeholder="Press Enter or comma to add"
-            sx={{ minWidth: '250px' }}
-          />
+      {/* Center Card */}
+      <div className="center-card">
+        <h1 className="title">Blog Platform</h1>
+        <p className="tagline">A sleek, professional space to share ideas, insights, and stories globally.</p>
 
-          <Button
-            variant="contained"
-            onClick={handleSearch}
-            sx={{
-              height: '56px',
-              px: 4,
-              backgroundColor: '#1976d2',
-              color: 'white',
-              fontWeight: 600,
-              textTransform: 'none',
-              '&:hover': {
-                backgroundColor: '#115293',
-              },
-            }}
-          >
-            Search
-          </Button>
-        </Box>
+        <div className="cta-buttons">
+          <Link to="/signup" className="btn signup-btn">Get Started</Link>
+          <Link to="/signin" className="btn login-btn-outline">Learn More</Link>
+        </div>
 
-        {/* Tags Section */}
-        {tags.length > 0 && (
-          <Box
-            sx={{
-              mt: 1,
-              mb: 3,
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1,
-              justifyContent: 'center',
-            }}
-          >
-            {tags.map((tag, index) => (
-              <Button
-                key={index}
-                size="small"
-                variant="outlined"
-                onClick={() => handleDelete(tag)}
-                sx={{
-                  borderRadius: '20px',
-                  textTransform: 'none',
-                  fontWeight: 500,
-                }}
-              >
-                {tag}
-              </Button>
-            ))}
-          </Box>
-        )}
+        <div className="scrolling-text-wrapper">
+          <div className="scrolling-text">
+            Empower ideas • Share insights • Grow your network • Inspire others • Connect globally •
+          </div>
+        </div>
+      </div>
 
-        {/* Blogs Display */}
-        <Box>
-          <Typography
-            variant="h5"
-            mb={2}
-            fontWeight={600}
-            color="#333"
-          >
-            {hasSearched
-              ? `Search Result (${searchResult.length})`
-              : 'All Blogs'}
-          </Typography>
+      {/* Background Particles */}
+      <div className="particles"></div>
 
-          <Grid container spacing={3}>
-            {(hasSearched ? searchResult : blogs).length === 0 ? (
-              <Grid size={{ xs: 12 }}>
-                <Typography variant="body1" color="gray">
-                  No blogs found.
-                </Typography>
-              </Grid>
-            ) : (
-              (hasSearched ? searchResult : blogs).map((blog) => (
-                <Grid key={blog._id} size={{ xs: 12, sm: 6, md: 4 }}>
-                  <Blog data={blog} />
-                </Grid>
-              ))
-            )}
-          </Grid>
-        </Box>
+      <style>{`
+        /* Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body, #root { height: 100%; width: 100%; }
+        body { font-family: 'Inter', sans-serif; }
 
-      </Box>
+        .home-container {
+          position: relative;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #2c2f7f, #1c1c2b, #000);
+          color: #fff;
+          overflow: hidden;
+        }
+
+        /* Floating Particles */
+        .particles {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.3), transparent 60%),
+                      radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.3), transparent 60%),
+                      radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.2), transparent 70%);
+          animation: move-bg 30s linear infinite alternate;
+        }
+
+        @keyframes move-bg {
+          0% { transform: translate(0, 0) rotate(0deg); }
+          50% { transform: translate(100px, -50px) rotate(15deg); }
+          100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* Auth Buttons */
+        .auth-buttons {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          display: flex;
+          gap: 12px;
+          z-index: 2;
+        }
+
+        .btn {
+          padding: 10px 20px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 16px;
+          text-decoration: none;
+          transition: all 0.3s ease;
+        }
+
+        .login-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: #fff;
+        }
+
+        .login-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .signup-btn { background: #6366f1; color: #fff; }
+        .signup-btn:hover { background: #4f46e5; }
+        .login-btn-outline {
+          border: 1px solid rgba(255,255,255,0.2);
+          background: transparent; color: #fff;
+        }
+        .login-btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+        /* Center Card */
+        .center-card {
+          position: relative;
+          z-index: 2;
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(25px);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 32px;
+          padding: 60px 40px;
+          width: 90%;
+          max-width: 520px;
+          text-align: center;
+          box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+        }
+
+        .title {
+          font-size: 2.75rem;
+          font-weight: 800;
+          margin-bottom: 16px;
+        }
+
+        .tagline {
+          font-size: 1.15rem;
+          color: #ccc;
+          margin-bottom: 36px;
+        }
+
+        .cta-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 18px;
+          margin-bottom: 28px;
+        }
+
+        .btn.signup-btn, .btn.login-btn-outline {
+          padding: 14px 30px;
+          border-radius: 18px;
+          font-size: 1rem;
+          font-weight: 600;
+        }
+
+        .btn.signup-btn:hover, .btn.login-btn-outline:hover {
+          transform: translateY(-3px) scale(1.05);
+        }
+
+        /* Scrolling Text */
+        .scrolling-text-wrapper {
+          overflow: hidden;
+          border-top: 1px solid rgba(255,255,255,0.1);
+          padding-top: 12px;
+        }
+
+        .scrolling-text {
+          display: inline-block;
+          white-space: nowrap;
+          color: #818cf8;
+          animation: scroll-left 20s linear infinite;
+        }
+
+        @keyframes scroll-left {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+          .title { font-size: 2rem; }
+          .tagline { font-size: 1rem; }
+          .cta-buttons { flex-direction: column; gap: 12px; }
+        }
+      `}</style>
     </div>
   );
-};
-
-export default Home;
+}

@@ -1,134 +1,230 @@
+// import Blog from "../models/blog.js";
+
+
+// /* =======================
+//    CREATE BLOG
+// ======================= */
+// export const createBlog = async (req, res) => {
+//   try {
+//     const blog = new Blog(req.body);
+//     await blog.save();
+//     res.status(201).json({ blog });
+//   } catch (error) {
+//     res.status(500).json({ message: "Create failed" });
+//   }
+// };
+
+// /* =======================
+//    GET BLOGS BY ROLE
+// ======================= */
+// export const getBlogsByRole = async (req, res) => {
+//   const { userId, role } = req.query;
+
+//   try {
+//     const blogs =
+//       role === "admin"
+//         ? await Blog.find({}).populate("author", "name email role")
+//         : await Blog.find({ author: userId }).populate("author", "name email");
+
+//     res.status(200).json({ blogs });
+//   } catch (error) {
+//     res.status(500).json({ message: "Fetch failed" });
+//   }
+// };
+
+// /* =======================
+//    GET SINGLE BLOG
+// ======================= */
+// export const getBlogById = async (req, res) => {
+//   try {
+//     const blog = await Blog.findById(req.params.id).populate(
+//       "author",
+//       "name email role"
+//     );
+
+//     if (!blog) {
+//       return res.status(404).json({ message: "Blog not found" });
+//     }
+
+//     res.status(200).json({ blog });
+//   } catch (error) {
+//     res.status(500).json({ message: "Fetch failed" });
+//   }
+// };
+
+// /* =======================
+//    SEARCH BLOGS
+// ======================= */
+// export const getBlogBySearch = async (req, res) => {
+//   const { searchQuery, tags } = req.query;
+
+//   try {
+//     let query = {};
+
+//     if (searchQuery) {
+//       query.title = { $regex: searchQuery, $options: "i" };
+//     }
+
+//     if (tags) {
+//       query.tags = { $in: tags.split(",") };
+//     }
+
+//     const blogs = await Blog.find(query).populate("author", "name email");
+//     res.status(200).json({ blogs });
+//   } catch (error) {
+//     res.status(500).json({ message: "Search failed" });
+//   }
+// };
+
+// /* =======================
+//    UPDATE BLOG
+// ======================= */
+// export const updateBlog = async (req, res) => {
+//   try {
+//     const updatedBlog = await Blog.findByIdAndUpdate(
+//       req.params.id,
+//       req.body,
+//       { new: true }
+//     );
+
+//     res.status(200).json({ updatedBlog });
+//   } catch (error) {
+//     res.status(500).json({ message: "Update failed" });
+//   }
+// };
+
+// /* =======================
+//    DELETE BLOG
+// ======================= */
+// export const deleteBlog = async (req, res) => {
+//   try {
+//     await Blog.findByIdAndDelete(req.params.id);
+//     res.status(200).json({ message: "Deleted" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Delete failed" });
+//   }
+// };
+
+
+
+
 import Blog from "../models/blog.js";
-import user from '../models/user.js';
 
-
+/* =======================
+   CREATE BLOG
+======================= */
 export const createBlog = async (req, res) => {
-  const { title, description, author, selectedFile, tags } = req.body;
-
   try {
-    const existing_user = await user.findById(author);
-
-    if (!existing_user) {
-      return res.status(404).json({ mssg: "User doesn't exist" });
-    }
-
-    const blog = new Blog({
-      title,
-      description,
-      author,
-      selectedFile,
-      tags: Array.isArray(tags)
-        ? tags
-        : typeof tags === "string"
-        ? tags.split(",").map((t) => t.trim())
-        : [],
-    });
-
+    const blog = new Blog(req.body);
     await blog.save();
-
-    return res.status(201).json({ mssg: "Blog created successfully", blog });
+    res.status(201).json(blog);
   } catch (error) {
-    return res.status(500).json({ mssg: "Something went wrong" });
+    // console.error("Create Blog Error:", error);
+    res.status(500).json({ message: "Create failed" });
   }
 };
 
+/* =======================
+   GET BLOGS BY ROLE
+======================= */
+export const getBlogsByRole = async (req, res) => {
+  const { userId, role } = req.query;
 
-export const getAllBlogs = async (req, res) => {
-    try {
-        const blogs = await Blog.find({});
+  try {
+    // console.log("ROLE:", role, "USER:", userId);
 
-        return res.status(200).json({ blogs });
-    }
-    catch (error) {
-        return res.status(500).json({ mssg: "Something went wrong" })
-    }
-}
+    const blogs =
+      role === "admin"
+        ? await Blog.find({})
+            .populate("author", "name email role")
+            .sort({ createdAt: -1 })
+        : await Blog.find({ author: userId })
+            .populate("author", "name email")
+            .sort({ createdAt: -1 });
 
+    res.status(200).json(blogs);
+  } catch (error) {
+    // console.error("Get Blogs Error:", error);
+    res.status(500).json({ message: "Fetch failed" });
+  }
+};
+
+/* =======================
+   GET SINGLE BLOG
+======================= */
 export const getBlogById = async (req, res) => {
-    const { id } = req.params
+  try {
+    const blog = await Blog.findById(req.params.id).populate(
+      "author",
+      "name email role"
+    );
 
-    try {
-        const blog = await Blog.findById(id)
-
-        if (!blog) {
-            return res.status(404).json({ mssg: "Blog not foun" })
-        }
-        return res.status(200).json({ blog });
-    }
-    catch (error) {
-
-        return res.status(500).json({ mssg: "Something went wrong" })
-
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
     }
 
-}
+    res.status(200).json(blog);
+  } catch (error) {
+    // console.error("Get Blog Error:", error);
+    res.status(500).json({ message: "Fetch failed" });
+  }
+};
 
-
+/* =======================
+   SEARCH BLOGS
+======================= */
 export const getBlogBySearch = async (req, res) => {
   const { searchQuery, tags } = req.query;
 
   try {
     let query = {};
 
-    // 🔎 Title search
-    if (searchQuery && searchQuery.trim()) {
-      query.title = { $regex: searchQuery.trim(), $options: 'i' };
+    if (searchQuery) {
+      query.title = { $regex: searchQuery, $options: "i" };
     }
 
-    // 🏷 Tag search
-    if (tags && tags.trim()) {
-      const tagsArray = tags
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(Boolean)
-        .map(tag => (tag.startsWith('#') ? tag : `#${tag}`));
-
-      // ✅ MATCH ANY tag
-      query.tags = { $in: tagsArray };
+    if (tags) {
+      query.tags = { $in: tags.split(",") };
     }
 
-    // ❌ Block empty search (VERY IMPORTANT)
-    if (Object.keys(query).length === 0) {
-      return res.status(400).json({ blogs: [] });
-    }
+    const blogs = await Blog.find(query)
+      .populate("author", "name email role")
+      .sort({ createdAt: -1 });
 
-    const blogs = await Blog.find(query);
-
-    return res.status(200).json({ blogs });
+    res.status(200).json(blogs);
   } catch (error) {
-    console.error("🔥 getBlogBySearch Error:", error);
-    return res.status(500).json({ message: "Search failed" });
+    // console.error("Search Error:", error);
+    res.status(500).json({ message: "Search failed" });
   }
 };
 
+/* =======================
+   UPDATE BLOG
+======================= */
+export const updateBlog = async (req, res) => {
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
 
+    res.status(200).json(updatedBlog);
+  } catch (error) {
+    // console.error("Update Error:", error);
+    res.status(500).json({ message: "Update failed" });
+  }
+};
 
-
-
-
-
-export const updateBlog = async(req,res) => {
-    const { id } = req.params
-    const { title, description, selectedFile, tags } = req.body;
-   
-    try{
-       const updatedBlog = await Blog.findByIdAndUpdate(id, {title,description,selectedFile,tags}, {new: true})
-
-       return res.status(200).json({updatedBlog})
-    }
-    catch(error){
-        return res.status(500).json({ mssg: "Something went wrong" })
-    }
-}
-
- export const  deleteBlog = async(req,res) => {
-        const {id} = req.params;
-    try{
-      await Blog.findByIdAndDelete(id);
-
-      return res.status(200).json({mssg: "Blog deleted sucessfully"})
-    }
-    catch(error) {
-        return res.status(500).json({ mssg: "Something went wrong" })
-    }
- }
+/* =======================
+   DELETE BLOG
+======================= */
+export const deleteBlog = async (req, res) => {
+  try {
+    await Blog.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Deleted successfully" });
+  } catch (error) {
+    // console.error("Delete Error:", error);
+    res.status(500).json({ message: "Delete failed" });
+  }
+};
