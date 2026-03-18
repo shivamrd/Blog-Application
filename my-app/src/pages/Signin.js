@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,23 +30,17 @@ const Signin = () => {
         email: formData.email.toLowerCase(),
       });
 
-      // ✅ STORE FULL AUTH DATA
-      localStorage.setItem(
-        "profile",
-        JSON.stringify(response.data)
-      );
-
-      navigate('/blogs', { replace: true });
-
+      localStorage.setItem("profile", JSON.stringify(response.data));
+      navigate("/blogs", { replace: true });
     } catch (error) {
-      console.log("Signin Failed:", error.response?.data?.message);
       alert(error.response?.data?.message || "Signin failed");
       setFormData({ email: "", password: "" });
     }
   };
 
   return (
-    <Box display="flex" height="100vh" bgcolor="#f5f5f5">
+    <Box display="flex" minHeight="100vh" bgcolor="background.default">
+      
       {/* LEFT FORM */}
       <Box
         flex={1}
@@ -54,9 +49,9 @@ const Signin = () => {
         justifyContent="center"
         alignItems="center"
         px={4}
-        bgcolor="#ffffff"
+        bgcolor="background.paper"
       >
-        <Typography fontSize="40px" fontWeight="600">
+        <Typography fontSize="40px" fontWeight="600" color="text.primary">
           Welcome Back 👋
         </Typography>
 
@@ -105,7 +100,9 @@ const Signin = () => {
         display="flex"
         justifyContent="center"
         alignItems="center"
-        sx={{ background: "#e3f2fd" }}
+        sx={{
+          bgcolor: "background.default",
+        }}
       >
         <img
           src={signinimage}

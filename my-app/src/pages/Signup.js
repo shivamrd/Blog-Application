@@ -23,9 +23,8 @@ const Signup = () => {
   };
 
   const handleSignup = async (e) => {
-    e.preventDefault(); // ✅ VERY IMPORTANT
+    e.preventDefault();
 
-    // basic frontend validation
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
       return;
@@ -34,36 +33,32 @@ const Signup = () => {
     try {
       const response = await signup({
         ...formData,
-        email: formData.email.toLowerCase(), // ✅ normalize email
+        email: formData.email.toLowerCase(),
       });
 
-      // ✅ save auth data
+      // ✅ FIX: SAME STRUCTURE AS SIGNIN
       localStorage.setItem(
-        "user",
-        JSON.stringify(response.data.result)
+        "profile",
+        JSON.stringify(response.data)
       );
-      localStorage.setItem("token", response.data.token);
 
-      navigate('/blogs', { replace: true });
+      navigate("/blogs", { replace: true });
 
     } catch (error) {
-      console.log(
-        "Signup Failed:",
-        error.response?.data?.message
-      );
       alert(error.response?.data?.message || "Signup failed");
     }
   };
 
   return (
-    <Box display="flex" height="100vh" bgcolor="#f5f5f5">
-      {/* Left Image */}
+    <Box display="flex" minHeight="100vh" bgcolor="background.default">
+      
+      {/* LEFT IMAGE */}
       <Box
         flex={1}
         display="flex"
         justifyContent="center"
         alignItems="center"
-        sx={{ background: "#e3f2fd" }}
+        sx={{ bgcolor: "background.default" }}
       >
         <img
           src={signupimage}
@@ -76,7 +71,7 @@ const Signup = () => {
         />
       </Box>
 
-      {/* Right Form */}
+      {/* RIGHT FORM */}
       <Box
         flex={1}
         display="flex"
@@ -84,9 +79,9 @@ const Signup = () => {
         justifyContent="center"
         alignItems="center"
         px={4}
-        bgcolor="#fff"
+        bgcolor="background.paper"
       >
-        <Typography fontSize="36px" fontWeight="600">
+        <Typography fontSize="36px" fontWeight="600" color="text.primary">
           Create Account
         </Typography>
 

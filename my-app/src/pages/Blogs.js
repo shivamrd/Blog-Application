@@ -83,7 +83,7 @@ setBlogs(res.data);
     <>
       {/* <Navbar /> */}
 
-      <Box sx={{ p: 4, backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+      <Box sx={{ p: 4, bgcolor: "background.default", minHeight: "100vh" }}>
         {/* SEARCH */}
         <Box
           sx={{
@@ -92,7 +92,7 @@ setBlogs(res.data);
             flexWrap: "wrap",
             justifyContent: "center",
             p: 3,
-            bgcolor: "#fff",
+            bgcolor: "background.paper",
             borderRadius: 3,
             mb: 4,
           }}
