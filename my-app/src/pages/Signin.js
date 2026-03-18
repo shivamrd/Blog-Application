@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import signinimage from "../images/signinimage.jpg";
 import { signin } from "../api";
 
@@ -11,7 +11,7 @@ const Signin = () => {
     password: "",
   });
 
-  const navigate = useNavigate();
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,7 +31,9 @@ const Signin = () => {
       });
 
       localStorage.setItem("profile", JSON.stringify(response.data));
-      navigate("/blogs", { replace: true });
+      
+    // ✅ HARD REPLACE (FINAL FIX)
+    window.location.replace("/blogs");
     } catch (error) {
       alert(error.response?.data?.message || "Signin failed");
       setFormData({ email: "", password: "" });

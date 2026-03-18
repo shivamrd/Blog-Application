@@ -24,7 +24,7 @@ const Navbar = ({ mode, setMode }) => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/");
+     window.location.replace("/");
   };
 
   const baseBtn = {
